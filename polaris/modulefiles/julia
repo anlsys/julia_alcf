@@ -1,13 +1,13 @@
 #%Module1.0
 
 proc ModulesHelp { } {
-    puts stderr "Julia programming language version 1.11.7"
+    puts stderr "Julia programming language"
 }
 
-module-whatis "Julia programming language version 1.11.7"
+module-whatis "Julia programming language version"
 
-set version "1.11.7"
-set prefix /eagle/Julia/mschanen/soft/julia/julia-${version}
+set version "1.12"
+set prefix USER_DEPOT_PATH
 
 module unload xalt
 conflict julia
@@ -17,11 +17,11 @@ module load cuda/12
 module load craype-accel-nvidia90
 module load cray-hdf5-parallel
 
-prepend-path PATH ${prefix}/bin
-prepend-path MANPATH ${prefix}/share/man
-prepend-path LIBRARY_PATH ${prefix}/lib
-prepend-path LD_LIBRARY_PATH ${prefix}/lib
-append-path JULIA_DEPOT_PATH ${prefix}/../depot
+prepend-path PATH ${prefix}/julia/bin
+prepend-path MANPATH ${prefix}/julia/share/man
+prepend-path LIBRARY_PATH ${prefix}/julia/lib
+prepend-path LD_LIBRARY_PATH ${prefix}/julia/lib
+append-path JULIA_DEPOT_PATH ${prefix}
 
 setenv HTTP_PROXY "http://proxy.alcf.anl.gov:3128"
 setenv HTTPS_PROXY "http://proxy.alcf.anl.gov:3128"
@@ -29,7 +29,7 @@ setenv http_proxy "http://proxy.alcf.anl.gov:3128"
 setenv https_proxy "http://proxy.alcf.anl.gov:3128"
 setenv ftp_proxy "http://proxy.alcf.anl.gov:3128"
 
-prepend-path LD_LIBRARY_PATH $env(CRAY_NVIDIA_PREFIX)/cuda/12.2/extras/CUPTI/lib64
+prepend-path LD_LIBRARY_PATH $env(CRAY_NVIDIA_PREFIX)/cuda/12.6/extras/CUPTI/lib64
 
 setenv JULIA_CUDA_MEMORY_POOL "none"
 setenv MPICH_GPU_SUPPORT_ENABLED "1"

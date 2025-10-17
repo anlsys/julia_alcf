@@ -31,15 +31,6 @@ sed -i "s|USER_DEPOT_PATH|$JULIA_DEPOT_PATH|g" $JULIA_DEPOT_PATH/modulefiles/jul
 echo "Configuring environment with depot path..."
 sed -i "s|USER_DEPOT|$JULIA_DEPOT_PATH|g" $JULIA_DEPOT_PATH/environments/v1.12/LocalPreferences.toml
 
-# Create symbolic links to system libraries in Julia's lib directory
-echo "Creating symbolic links to system libraries..."
-ln -sf /usr/lib64/libiga64.so.2 $JULIA_DEPOT_PATH/julia/lib/libiga64.so
-ln -sf /usr/lib64/libigc.so.2 $JULIA_DEPOT_PATH/julia/lib/libigc.so
-ln -sf /usr/lib64/libigdfcl.so.2 $JULIA_DEPOT_PATH/julia/lib/libigdfcl.so
-ln -sf /usr/lib64/intel-opencl/libigdrcl.so $JULIA_DEPOT_PATH/julia/lib/libigdrcl.so
-ln -sf /usr/lib64/libopencl-clang.so.15 $JULIA_DEPOT_PATH/julia/lib/libopencl-clang.so
-ln -sf /usr/lib64/libopencl-clang.so.15 $JULIA_DEPOT_PATH/julia/lib/libopencl-clang.so.15
-
 echo "Julia installation completed successfully."
 echo "Load the Julia module with:"
 echo "module use $JULIA_DEPOT_PATH/modulefiles && module load julia"
