@@ -1,0 +1,22 @@
+#%Module1.0
+
+proc ModulesHelp { } {
+    puts stderr "Julia programming language"
+}
+
+module-whatis "Julia programming language"
+
+set version "1.12"
+set prefix USER_DEPOT_PATH
+
+prepend-path PATH ${prefix}/julia/bin
+prepend-path MANPATH ${prefix}/julia/share/man
+prepend-path LIBRARY_PATH ${prefix}/julia/lib
+prepend-path LD_LIBRARY_PATH ${prefix}/julia/lib
+append-path JULIA_DEPOT_PATH ${prefix}
+
+setenv HTTP_PROXY "http://proxy.alcf.anl.gov:3128"
+setenv HTTPS_PROXY "http://proxy.alcf.anl.gov:3128"
+setenv http_proxy "http://proxy.alcf.anl.gov:3128"
+setenv https_proxy "http://proxy.alcf.anl.gov:3128"
+setenv ftp_proxy "http://proxy.alcf.anl.gov:3128"
