@@ -2,32 +2,61 @@ using CUDA, CUDA.CUSPARSE
 using CUDSS
 using LinearAlgebra
 using SparseArrays
+using Adapt
+using BenchmarkTools
+using Profile
 
+device_count = CUDA.ndevices()
+device_indices = collect(0:device_count-1)
 T = Float64
 n = 100
-A_cpu = sprand(T, n, n, 0.01)
-A_cpu = A_cpu + A_cpu' + I
-b_cpu = rand(T, n)
 
-A_gpu = CuSparseMatrixCSR(A_cpu)
-b_gpu = CuVector(b_cpu)
-x_gpu = similar(b_gpu)
+gpu(x) = adapt(CUDABackend(), x)
+function create_matrix(T, n, density)
+    A_cpu = sprand(T, n, n, density)
+    A_cpu = A_cpu + A_cpu' + I
+    A_gpu = CuSparseMatrixCSR(gpu(A_cpu.colptr), gpu(A_cpu.rowval), gpu(A_cpu.nzval), size(A_cpu))
+    GB = nnz(A_cpu) * (sizeof(T) + sizeof(Int32)) / (1024^3)
+    println("Creating matrix of size $(n)x$(n) with density $(density) and $(nnz(A_cpu)) non-zeros.")
+    println("Approximate size of the matrix in GPU memory: $(round(GB, digits=2)) GB")
+    return A_gpu
+end
 
-solver = CudssSolver(A_gpu, "S", 'F')
+function create_solver(A::T, device_count, device_indices) where {T <: AbstractSparseMatrix}
+    handle = CUDSS.cudssCreateMg(Cint(device_count), Cint.(device_indices))
+    data = CudssData(handle)
+    config = CudssConfig(Cint(device_count), Cint.(device_indices))
+    matrix = CudssMatrix(A, "S", 'F')
+    solver = CudssSolver(matrix, config, data)
+    return solver
+end
 
-# Use the hybrid mode (host and device memory)
+function analysis!(solver, x, b)
+    cudss("analysis", solver, x, b)
+    CUDA.synchronize()
+end
 
-cudss("analysis", solver, x_gpu, b_gpu)
+function factorization!(solver, x, b)
+    cudss("factorization", solver, x, b)
+    CUDA.synchronize()
+end
 
-# Minimal amount of device memory required in the hybrid memory mode.
-# nbytes_gpu = cudss_get(solver, "hybrid_device_memory_min")
+function solve!(solver, x, b)
+    cudss("solve", solver, x, b)
+    CUDA.synchronize()
+end
 
-# Device memory limit for the hybrid memory mode.
-# Only use it if you don't want to rely on the internal default heuristic.
-# cudss_set(solver, "hybrid_device_memory_limit", nbytes_gpu)
+@time A = create_matrix(T, n, 0.01)
+@time solver = create_solver(A, device_count, device_indices)
 
-cudss("factorization", solver, x_gpu, b_gpu)
-cudss("solve", solver, x_gpu, b_gpu)
+@info "Starting analysis..."
+b = gpu(rand(T, n))
+x = similar(b)
+@btime analysis!(solver, x, b)
 
-r_gpu = b_gpu - CuSparseMatrixCSR(A_cpu) * x_gpu
-norm(r_gpu)
+@info "Starting factorization..."
+@btime factorization!(solver, x, b)
+@info "Starting solve..."
+@btime solve!(solver, x, b)
+r = b - A * x
+println("Residual norm ||b - A*x||: $(norm(r))")
