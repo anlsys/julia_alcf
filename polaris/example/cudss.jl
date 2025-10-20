@@ -8,6 +8,7 @@ using Profile
 
 device_count = CUDA.ndevices()
 device_indices = collect(0:device_count-1)
+@info "Using $device_count GPU devices: $device_indices"
 T = Float64
 n = 100
 
