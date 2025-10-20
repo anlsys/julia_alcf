@@ -13,15 +13,11 @@ module unload xalt
 conflict julia
 conflict xalt
 
-module load cuda/12
-module load craype-accel-nvidia90
-module load cray-hdf5-parallel
-
 prepend-path PATH ${prefix}/julia/bin
 prepend-path MANPATH ${prefix}/julia/share/man
 prepend-path LIBRARY_PATH ${prefix}/julia/lib
 prepend-path LD_LIBRARY_PATH ${prefix}/julia/lib
-append-path JULIA_DEPOT_PATH ${prefix}
+setenv JULIA_DEPOT_PATH ${prefix}
 
 setenv HTTP_PROXY "http://proxy.alcf.anl.gov:3128"
 setenv HTTPS_PROXY "http://proxy.alcf.anl.gov:3128"
@@ -29,13 +25,13 @@ setenv http_proxy "http://proxy.alcf.anl.gov:3128"
 setenv https_proxy "http://proxy.alcf.anl.gov:3128"
 setenv ftp_proxy "http://proxy.alcf.anl.gov:3128"
 
-prepend-path LD_LIBRARY_PATH $env(CRAY_NVIDIA_PREFIX)/cuda/12.6/extras/CUPTI/lib64
+#prepend-path LD_LIBRARY_PATH /opt/nvidia/hpc_sdk/Linux_x86_64/24.11/cuda/12.6/extras/CUPTI/lib64
 
 setenv JULIA_CUDA_MEMORY_POOL "none"
 setenv MPICH_GPU_SUPPORT_ENABLED "1"
 
 if { [info exists env(CRAY_MPICH_DIR)] } {
-    setenv JULIA_MPI_PATH $env(CRAY_MPICH_DIR)
+    setenv JULIA_MPI_PATH /opt/cray/pe/mpich/8.1.32/ofi/nvidia/23.3
 }
 
 setenv JULIA_MPI_HAS_CUDA "1"
