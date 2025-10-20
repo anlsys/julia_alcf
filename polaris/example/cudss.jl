@@ -5,6 +5,7 @@ using SparseArrays
 using Adapt
 using BenchmarkTools
 using Profile
+using KernelAbstractions
 
 device_count = CUDA.ndevices()
 device_indices = collect(0:device_count-1)
@@ -12,6 +13,7 @@ device_indices = collect(0:device_count-1)
 T = Float64
 n = 100
 
+cpu(x) = adapt(CPU(), x)
 gpu(x) = adapt(CUDABackend(), x)
 function create_matrix(T, n, density)
     A_cpu = sprand(T, n, n, density)
@@ -59,5 +61,7 @@ x = similar(b)
 @btime factorization!(solver, x, b)
 @info "Starting solve..."
 @btime solve!(solver, x, b)
+r = cpu(b) - cpu(A) * cpu(x)
+println("Residual norm ||b - A*x|| on CPU: $(norm(r))")
 r = b - A * x
-println("Residual norm ||b - A*x||: $(norm(r))")
+println("Residual norm ||b - A*x|| on GPU: $(norm(r))")
