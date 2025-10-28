@@ -5,7 +5,8 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Prompt user for Julia depot path
-read -p "Enter Julia depot path: " user_depot_path
+echo "Enter Julia depot path. This should be on a fast filesystem."
+read -p "[/lus/flare/PROJECT/..] " user_depot_path
 
 # Set Julia depot path
 export JULIA_DEPOT_PATH=$user_depot_path
@@ -17,8 +18,8 @@ mkdir -p $JULIA_DEPOT_PATH
 
 # Download and extract Julia directly into $JULIA_DEPOT_PATH/julia
 echo "Downloading and installing Julia to $JULIA_DEPOT_PATH/julia..."
-curl -L https://julialang-s3.julialang.org/bin/linux/x64/1.12/julia-1.12.0-linux-x86_64.tar.gz | tar xz -C $JULIA_DEPOT_PATH
-mv $JULIA_DEPOT_PATH/julia-1.12.0 $JULIA_DEPOT_PATH/julia
+curl -L https://julialang-s3.julialang.org/bin/linux/x64/1.12/julia-1.12.1-linux-x86_64.tar.gz | tar xz -C $JULIA_DEPOT_PATH
+mv $JULIA_DEPOT_PATH/julia-1.12.1 $JULIA_DEPOT_PATH/julia
 mkdir -p $JULIA_DEPOT_PATH/environments/v1.12
 echo "Copying global LocalPreferences.toml to $JULIA_DEPOT_PATH/environments/v1.12/LocalPreferences.toml..."
 cp $SCRIPT_DIR/environment/LocalPreferences.toml $JULIA_DEPOT_PATH/environments/v1.12/LocalPreferences.toml
