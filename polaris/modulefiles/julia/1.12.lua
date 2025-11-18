@@ -17,10 +17,12 @@ if not isDir(julia_dir) then
               "Please run the setup script to install Julia " .. version .. ".")
 end
 
-unload("xalt")
+purge()
 family("julia")
 conflict("julia")
-conflict("xalt")
+load("PrgEnv-nvidia/8.6.0")
+load("cray-hdf5-parallel/1.14.3.5")
+unload("xalt")
 
 prepend_path("PATH", pathJoin(julia_dir, "bin"))
 prepend_path("MANPATH", pathJoin(julia_dir, "share/man"))

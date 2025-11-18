@@ -1,6 +1,8 @@
 [CUDA_Runtime_jll]
-__clear__ = ["version"]
+__clear__ = ["local"]
 local = "true"
+version = "13.0"
+
 
 [HDF5]
 libhdf5 = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5.so"
