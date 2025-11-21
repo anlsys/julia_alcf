@@ -47,6 +47,8 @@ for JULIA_MINOR in "${!JULIA_VERSIONS[@]}"; do
     mkdir -p $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR
     echo "Copying global LocalPreferences.toml to $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml..."
     cp $SCRIPT_DIR/environment/LocalPreferences.toml $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
+    echo "Copying global Project.toml to $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/Project.toml..."
+    cp $SCRIPT_DIR/environment/Project.toml $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/Project.toml
 
     # Configure environment with depot path
     echo "Configuring environment with depot path..."
@@ -75,9 +77,8 @@ echo "Installed versions:"
 for JULIA_MINOR in "${!JULIA_VERSIONS[@]}"; do
     echo "  - Julia ${JULIA_VERSIONS[$JULIA_MINOR]} (module: julia/$JULIA_MINOR)"
 done
-echo ""
-echo "Load a Julia module with:"
-echo "  module use $JULIA_DEPOT_PATH/modulefiles && module load julia/<version>"
-echo ""
-echo "Add the module path to your .bashrc or .zshrc for automatic loading:"
-echo "  module use $JULIA_DEPOT_PATH/modulefiles"
+echo "Julia installation completed successfully."
+echo "Load the Julia module with:"
+echo "module use $JULIA_DEPOT_PATH/modulefiles && module load julia"
+
+echo "Add the module to your .bashrc or .zshrc for automatic loading."
