@@ -4,7 +4,7 @@ Module julia
 
 help([[Julia programming language]])
 
-whatis("Julia programming language version 1.11)
+whatis("Julia programming language version 1.11")
 
 -- Set JULIA_DEPOT_PATH to default if not already set
 local julia_depot = os.getenv("JULIA_DEPOT_PATH")
