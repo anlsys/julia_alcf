@@ -7,7 +7,7 @@ help([[Julia programming language]])
 whatis("Julia programming language version 1.10")
 
 local version = "1.10"
-local prefix = "USER_DEPOT_PATH"
+local prefix = "SYSTEM_DEPOT_PATH"
 local julia_dir = pathJoin(prefix, "julia-" .. version)
 
 -- Check if Julia installation directory exists
@@ -26,7 +26,7 @@ prepend_path("PATH", pathJoin(julia_dir, "bin"))
 prepend_path("MANPATH", pathJoin(julia_dir, "share/man"))
 prepend_path("LIBRARY_PATH", pathJoin(julia_dir, "lib"))
 prepend_path("LD_LIBRARY_PATH", pathJoin(julia_dir, "lib"))
-setenv("JULIA_DEPOT_PATH", "USER_DEPOT_PATH")
+setenv("JULIA_DEPOT_PATH", "SYSTEM_DEPOT_PATH")
 
 setenv("HTTP_PROXY", "http://proxy.alcf.anl.gov:3128")
 setenv("HTTPS_PROXY", "http://proxy.alcf.anl.gov:3128")

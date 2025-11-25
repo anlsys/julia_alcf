@@ -1,0 +1,26 @@
+[MPIPreferences]
+__clear__ = ["preloads_env_switch"]
+_format = "1.0"
+abi = "MPICH"
+binary = "system"
+cclibs = []
+libmpi = "/opt/aurora/25.190.0/spack/unified/0.10.1/install/linux-sles15-x86_64/oneapi-2025.2.0/mpich-develop-git.6037a7a-cym6jg6/lib/libmpi"
+mpiexec = "mpiexec"
+preloads = []
+
+[NEO_jll]
+libigdrcl_path = "USER_DEPOT/julia/lib/libigdrcl.so"
+libze_intel_gpu_path = "/usr/lib64/libze_intel_gpu.so.1"
+
+[gmmlib_jll]
+libigdgmm_path = "/usr/lib64/libigdgmm.so"
+
+[libigc_jll]
+libiga_path = "USER_DEPOT/julia/lib/libiga64.so"
+libigc_path = "USER_DEPOT/julia/lib/libigc.so"
+libigdfcl_path = "USER_DEPOT/julia/lib/libigdfcl.so"
+libopencl_clang_path = "USER_DEPOT/julia/lib/libopencl-clang.so.15"
+
+[oneAPI_Level_Zero_Loader_jll]
+libze_loader_path = "/usr/lib64/libze_loader.so"
+libze_validation_layer_path = "/usr/lib64/libze_validation_layer.so"
