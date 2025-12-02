@@ -1,0 +1,22 @@
+[CUDA_Runtime_jll]
+__clear__ = ["version", "local"]
+local = "true"
+version = "12.6"
+
+[HDF5]
+libhdf5 = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5.so"
+libhdf5_hl = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5_hl.so"
+
+[HDF5_jll]
+libhdf5_hl_path = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5_hl.so"
+libhdf5_path = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5.so"
+
+[MPIPreferences]
+_format = "1.1"
+abi = "MPICH"
+binary = "system"
+cclibs = ["hdf5_hl_parallel", "hdf5_parallel", "darshan", "z", "pals", "pmi", "pmi2", "dsmml"]
+libmpi = "libmpi_nvidia.so"
+mpiexec = "mpiexec"
+preloads = ["libmpi_gtl_cuda.so"]
+preloads_env_switch = "MPICH_GPU_SUPPORT_ENABLED"
