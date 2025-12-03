@@ -50,7 +50,7 @@ for JULIA_MINOR in "${!JULIA_VERSIONS[@]}"; do
 
     # Configure environment with depot path
     echo "Configuring environment with depot path..."
-    sed -i "s|USER_DEPOT|$JULIA_DEPOT_PATH|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
+    sed -i "s|USER_DEPOT|$JULIA_DEPOT_PATH/julia_binaries/julia-$JULIA_MINOR|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
 
     # Create symbolic links to system libraries in Julia's lib directory
     echo "Creating symbolic links to system libraries..."
