@@ -30,6 +30,8 @@ end
 
 load("cuda/12.6")
 unload("xalt")
+unload("darshan")
+unload("perftools-base")
 family("julia")
 conflict("julia")
 conflict("xalt")
