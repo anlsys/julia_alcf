@@ -58,3 +58,7 @@ setenv("http_proxy", "http://proxy.alcf.anl.gov:3128")
 setenv("https_proxy", "http://proxy.alcf.anl.gov:3128")
 setenv("ftp_proxy", "http://proxy.alcf.anl.gov:3128")
 
+if (mode() == "load") then
+    LmodMessage("Julia module v" .. version .. " successfully loaded.")
+    LmodMessage("Warning: Julia needs a large /tmp which is too small. It is set to " .. tmpdir)
+end
