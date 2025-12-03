@@ -3,7 +3,6 @@ __clear__ = ["version", "local"]
 local = "true"
 version = "12.6"
 
-
 [HDF5]
 libhdf5 = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5.so"
 libhdf5_hl = "/opt/cray/pe/hdf5-parallel/1.14.3.5/nvidia/23.3/lib/libhdf5_hl.so"
