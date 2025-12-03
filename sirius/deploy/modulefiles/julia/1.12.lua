@@ -65,3 +65,13 @@ if (mode() == "load") then
     LmodMessage("Julia module v" .. version .. " successfully loaded.")
     LmodMessage("Warning: Julia needs a large /tmp which is too small. It is set to " .. tmpdir)
 end
+-- Enable MPI with CUDA support
+local mpich_dir = os.getenv("CRAY_MPICH_DIR")
+setenv("JULIA_CUDA_MEMORY_POOL", "none")
+setenv("MPICH_GPU_SUPPORT_ENABLED", "1")
+if os.getenv("CRAY_MPICH_DIR") then
+    setenv("JULIA_MPI_PATH", mpich_dir)
+end
+setenv("JULIA_MPI_HAS_CUDA", "1")
+-- Color in REPL on login nodes
+setenv("TERM", "xterm-256color")
