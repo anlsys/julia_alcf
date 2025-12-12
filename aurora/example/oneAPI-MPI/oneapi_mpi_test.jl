@@ -1,26 +1,26 @@
 #!/usr/bin/env julia
 
 """
-Comprehensive CUDA-aware MPI test suite for Julia
+Comprehensive oneAPI-aware MPI test suite for Julia
 
-This script tests various MPI operations with CUDA arrays to verify
-that CUDA-aware MPI is working correctly.
+This script tests various MPI operations with oneAPI arrays to verify
+that oneAPI-aware MPI is working correctly.
 
 Usage:
-    mpirun -n 4 julia --project cuda_mpi_test.jl
+    mpirun -n 4 julia --project oneapi_mpi_test.jl
 """
 
 using oneAPI
 using MPI
 using Printf
 
-function check_cuda_mpi_support()
-    """Check if CUDA-aware MPI is properly configured"""
-    has_cuda = MPI.has_cuda()
-    if !has_cuda
-        error("CUDA-aware MPI is not available. Please check your MPI installation.")
+function check_oneapi_mpi_support()
+    """Check if oneAPI-aware MPI is properly configured"""
+    has_oneapi = MPI.has_oneapi()
+    if !has_oneapi
+        error("oneAPI-aware MPI is not available. Please check your MPI installation.")
     end
-    return has_cuda
+    return has_oneapi
 end
 
 function test_point_to_point_communication(comm)
@@ -278,7 +278,7 @@ function main()
 
     try
         # Check oneAPI-aware MPI support
-        check_cuda_mpi_support()
+        check_oneapi_mpi_support()
 
         # Initialize oneAPI context
         device_id = rank % oneAPI.ndevices()

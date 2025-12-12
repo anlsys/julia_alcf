@@ -3,7 +3,7 @@ Module julia
 ]]--
 
 local system_path = "SYSTEM_DEPOT_PATH"
-local version = "1.12"
+local version = "1.11"
 help([[Julia programming language]])
 
 whatis("Julia programming language version " .. version)
@@ -62,3 +62,5 @@ if (mode() == "load") then
     LmodMessage("Julia module v" .. version .. " successfully loaded.")
     LmodMessage("Warning: Julia needs a large /tmp which is too small. It is set to " .. tmpdir)
 end
+
+setenv("JULIA_MPI_HAS_ONEAPI", "1")
