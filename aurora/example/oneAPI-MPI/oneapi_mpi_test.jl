@@ -13,6 +13,11 @@ Usage:
 using oneAPI
 using MPI
 using Printf
+import KernelAbstractions as KA
+using Adapt
+
+KA.ndevices(::oneAPIBackend) = length(oneAPI.devices().handles)
+KA.device!(id::Integer) = oneAPI.device!(id - 1)  # Convert to 0-based index
 
 function check_oneapi_mpi_support()
     """Check if oneAPI-aware MPI is properly configured"""
@@ -23,7 +28,7 @@ function check_oneapi_mpi_support()
     return has_oneapi
 end
 
-function test_point_to_point_communication(comm)
+function test_point_to_point_communication(comm, backend)
     """Test point-to-point communication with GPU arrays"""
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
@@ -38,13 +43,13 @@ function test_point_to_point_communication(comm)
 
     if rank == 0
         # Send data from rank 0 to rank 1
-        send_data = oneAPI.collect(1.0f0:Float32(n))
+        send_data = adapt(backend, collect(1.0f0:Float32(n)))
         println("Rank $rank: Sending $(length(send_data)) elements to rank 1")
         MPI.Send(send_data, comm; dest=1, tag=42)
 
     elseif rank == 1
         # Receive data at rank 1
-        recv_data = oneAPI.zeros(Float32, n)
+        recv_data = adapt(backend, zeros(Float32, n))
         println("Rank $rank: Receiving data from rank 0")
         MPI.Recv!(recv_data, comm; source=0, tag=42)
 
@@ -63,7 +68,7 @@ function test_point_to_point_communication(comm)
     return success
 end
 
-function test_collective_operations(comm)
+function test_collective_operations(comm, backend)
     """Test collective operations with GPU arrays"""
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
@@ -71,7 +76,7 @@ function test_collective_operations(comm)
     success = true
 
     # Test Allreduce
-    gpu_data = oneAPI.fill(Float32(rank + 1), n)
+    gpu_data = adapt(backend, fill(Float32(rank + 1), n))
     original_value = rank + 1
 
     MPI.Allreduce!(gpu_data, +, comm)
@@ -88,9 +93,9 @@ function test_collective_operations(comm)
 
     # Test Broadcast
     if rank == 0
-        bcast_data = oneAPI.fill(Float32(π), n)
+        bcast_data = adapt(backend, fill(Float32(π), n))
     else
-        bcast_data = oneAPI.zeros(Float32, n)
+        bcast_data = adapt(backend, zeros(Float32, n))
     end
 
     MPI.Bcast!(bcast_data, 0, comm)
@@ -104,8 +109,8 @@ function test_collective_operations(comm)
     end
 
     # Test Allgather
-    local_data = oneAPI.fill(Float32(rank), 10)
-    gathered_data = oneAPI.zeros(Float32, 10 * size)
+    local_data = adapt(backend, fill(Float32(rank), 10))
+    gathered_data = adapt(backend, zeros(Float32, 10 * size))
 
     MPI.Allgather!(local_data, gathered_data, comm)
 
@@ -122,7 +127,7 @@ function test_collective_operations(comm)
     return success
 end
 
-function test_large_data_transfer(comm)
+function test_large_data_transfer(comm, backend)
     """Test communication with larger arrays to stress-test the system"""
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
@@ -137,7 +142,7 @@ function test_large_data_transfer(comm)
     success = true
 
     if rank == 0
-        large_data = oneAPI.rand(Float32, n)
+        large_data = adapt(backend, rand(Float32, n))
         checksum = sum(Array(large_data))
 
         println("Rank $rank: Sending large array ($(n) elements, ~$(@sprintf("%.1f", n*4/1024/1024)) MB)")
@@ -151,7 +156,7 @@ function test_large_data_transfer(comm)
         checksum_recv = zeros(Float32, 1)
         MPI.Recv!(checksum_recv, comm; source=0, tag=100)
 
-        large_data_recv = oneAPI.zeros(Float32, n)
+        large_data_recv = adapt(backend, zeros(Float32, n))
         println("Rank $rank: Receiving large array...")
         MPI.Recv!(large_data_recv, comm; source=0, tag=101)
 
@@ -172,25 +177,25 @@ function test_large_data_transfer(comm)
     return success
 end
 
-function test_multiple_gpu_communication(comm)
+function test_multiple_gpu_communication(comm, backend)
     """Test communication when multiple GPUs are available"""
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
 
-    n_devices = oneAPI.ndevices()
+    n_devices = KA.ndevices(backend)
     if n_devices < 2
         println("Rank $rank: Only $n_devices GPU(s) available, skipping multi-GPU test")
         return true
     end
 
     # Use different GPU for each rank
-    device_id = rank % n_devices
-    oneAPI.device!(device_id)
+    device_id = rank % n_devices + 1
+    KA.device!(backend, device_id)
 
     println("Rank $rank: Using GPU device $device_id (of $n_devices available)")
 
     # Simple allreduce test with device affinity
-    test_data = oneAPI.fill(Float32(device_id + 1), 100)
+    test_data = fill(Float32(device_id), 100)
     MPI.Allreduce!(test_data, +, comm)
 
     # Expected sum depends on how ranks map to devices
@@ -211,7 +216,7 @@ function test_multiple_gpu_communication(comm)
     end
 end
 
-function run_performance_benchmark(comm)
+function run_performance_benchmark(comm, backend)
     """Run a simple performance benchmark for oneAPI-aware MPI"""
     rank = MPI.Comm_rank(comm)
     size = MPI.Comm_size(comm)
@@ -230,7 +235,7 @@ function run_performance_benchmark(comm)
     end
 
     for msg_size in sizes
-        data = oneAPI.ones(Float32, msg_size)
+        data = adapt(backend, ones(Float32, msg_size))
 
         MPI.Barrier(comm)  # Synchronize before timing
 
@@ -238,7 +243,7 @@ function run_performance_benchmark(comm)
             start_time = time()
             for _ in 1:10  # Average over 10 iterations
                 MPI.Send(data, comm; dest=1, tag=0)
-                recv_data = oneAPI.zeros(Float32, msg_size)
+                recv_data = adapt(backend, zeros(Float32, msg_size))
                 MPI.Recv!(recv_data, comm; source=1, tag=1)
             end
             end_time = time()
@@ -251,7 +256,7 @@ function run_performance_benchmark(comm)
 
         elseif rank == 1
             for _ in 1:10
-                recv_data = oneAPI.zeros(Float32, msg_size)
+                recv_data = adapt(backend, zeros(Float32, msg_size))
                 MPI.Recv!(recv_data, comm; source=0, tag=0)
                 MPI.Send(recv_data, comm; dest=0, tag=1)
             end
@@ -272,17 +277,17 @@ function main()
         println("oneAPI-aware MPI Test Suite")
         println("="^60)
         println("Number of processes: $size")
-        println("Number of oneAPI devices: $(oneAPI.ndevices())")
+        println("Number of oneAPI devices: $(KA.ndevices(oneAPIBackend()))")
         println()
     end
 
     try
         # Check oneAPI-aware MPI support
-        check_oneapi_mpi_support()
+        backend = check_oneapi_mpi_support() ? oneAPIBackend() : error("oneAPI-aware MPI not supported")
 
         # Initialize oneAPI context
-        device_id = rank % oneAPI.ndevices()
-        oneAPI.device!(device_id)
+        device_id = rank % KA.ndevices(backend) + 1
+        KA.device!(backend, device_id)
 
         if rank == 0
             println("✓ oneAPI-aware MPI support confirmed")
@@ -297,7 +302,7 @@ function main()
             println("Running point-to-point communication test...")
         end
         MPI.Barrier(comm)
-        success = test_point_to_point_communication(comm)
+        success = test_point_to_point_communication(comm, backend)
         all_tests_passed &= success
 
         # Test 2: Collective operations
@@ -305,7 +310,7 @@ function main()
         if rank == 0
             println("\nRunning collective operations test...")
         end
-        success = test_collective_operations(comm)
+        success = test_collective_operations(comm, backend)
         all_tests_passed &= success
 
         # Test 3: Large data transfer
@@ -313,7 +318,7 @@ function main()
         if rank == 0
             println("\nRunning large data transfer test...")
         end
-        success = test_large_data_transfer(comm)
+        success = test_large_data_transfer(comm, backend)
         all_tests_passed &= success
 
         # Test 4: Multi-GPU communication
@@ -321,7 +326,7 @@ function main()
         if rank == 0
             println("\nRunning multi-GPU communication test...")
         end
-        success = test_multiple_gpu_communication(comm)
+        success = test_multiple_gpu_communication(comm, backend)
         all_tests_passed &= success
 
         # Performance benchmark
@@ -329,7 +334,7 @@ function main()
         if rank == 0 && size >= 2
             println("\nRunning performance benchmark...")
         end
-        run_performance_benchmark(comm)
+        run_performance_benchmark(comm, backend)
 
         # Final results
         MPI.Barrier(comm)
@@ -347,7 +352,7 @@ function main()
         println("Rank $rank: Error during testing: $e")
         rethrow(e)
     finally
-        MPI.Finalize()
+        # MPI.Finalize()
     end
 end
 
