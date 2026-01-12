@@ -28,7 +28,7 @@ if not isDir(julia_dir) then
               "Please run the setup script to install Julia " .. version .. ".")
 end
 
-load("cuda/12.6")
+load("cudatoolkit-standalone/13.0.1")
 unload("xalt")
 unload("darshan")
 unload("perftools-base")
