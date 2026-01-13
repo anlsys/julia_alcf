@@ -1,6 +1,0 @@
-[CUDA]
-default_memory = "unified"
-
-[CUDA_Runtime_jll]
-__clear__ = ["local"]
-version = "13.0"
