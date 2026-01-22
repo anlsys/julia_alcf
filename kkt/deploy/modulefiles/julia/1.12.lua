@@ -30,6 +30,7 @@ end
 
 load("cuda")
 load("libcudss")
+load("mpich-ofi")
 family("julia")
 conflict("julia")
 
