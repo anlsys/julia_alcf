@@ -1,4 +1,5 @@
 [extras]
+MPIPreferences = "3da0fdf6-3ccc-4f1b-acd9-58baa6c99267"
 NEO_jll = "700fe977-ac61-5f37-bbc8-c6c4b2b6a9fd"
 gmmlib_jll = "09858cae-167c-5acb-9302-fddc6874d481"
 libigc_jll = "94295238-5935-5bd7-bb0f-b00942e9bdd5"
