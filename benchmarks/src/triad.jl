@@ -61,6 +61,7 @@ function bench_triad(::Type{T}, backend, comm; num_elements::Int=65_536_000, num
         bandwidth = (bytes_transferred * 1e-9) / min_time
         precision = T == Float32 ? "Single" : "Double"
         println("$precision Precision Memory Bandwidth (triad): $bandwidth GB/s")
+        add_result!("$precision Precision Triad Bandwidth", bandwidth, "GB/s")
     end
 end
 

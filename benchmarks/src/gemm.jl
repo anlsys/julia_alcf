@@ -38,7 +38,7 @@ function bench_gemm(::Type{T}, backend, comm; size::Int=8192) where T
     if world_rank == 0
         flops_per_gemm = 2.0 * size^3
         gflops = (flops_per_gemm * world_size * 1e-9) / max_time
-        
+
         precision_name = if T == Float64
             "DGEMM"
         elseif T == Float32
@@ -48,8 +48,9 @@ function bench_gemm(::Type{T}, backend, comm; size::Int=8192) where T
         else
             "$(T)GEMM"
         end
-        
+
         println("$precision_name: $gflops GFlop/s (time: $(max_time*1000) ms)")
+        add_result!(precision_name, gflops, "GFlop/s")
     end
 end
 

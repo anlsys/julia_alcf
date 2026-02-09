@@ -78,6 +78,7 @@ function bench_peer2peer(backend, comm; mode::String="Tile2Tile", num_iterations
     if world_rank == 0
         uni_bw = (N_bytes * num_pairs) / uni_time  # GB/s (time in ns, bytes/ns = GB/s)
         println("$mode Unidirectional Bandwidth: $uni_bw GB/s")
+        add_result!("MPI P2P $mode Unidirectional", uni_bw, "GB/s")
     end
 
     # Add bidirectional transfers
@@ -92,6 +93,7 @@ function bench_peer2peer(backend, comm; mode::String="Tile2Tile", num_iterations
     if world_rank == 0
         bi_bw = (2 * N_bytes * num_pairs) / bi_time  # GB/s
         println("$mode Bidirectional Bandwidth: $bi_bw GB/s")
+        add_result!("MPI P2P $mode Bidirectional", bi_bw, "GB/s")
     end
 end
 

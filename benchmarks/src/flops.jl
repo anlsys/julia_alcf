@@ -61,6 +61,7 @@ function bench_flops(::Type{T}, backend, comm) where T
         gflops = (work_per_wi * local_wi * world_size * 1e-9) / max_time
         precision = T == Float32 ? "Single" : "Double"
         println("$precision Precision Peak Flops: $gflops GFlop/s")
+        add_result!("$precision Precision Peak Flops", gflops, "GFlop/s")
     end
 end
 

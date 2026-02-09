@@ -52,6 +52,7 @@ function run_intranode(backend, comm)
         total_bytes = Float64(REPEAT) * N * sizeof(Float32)
         bw_gbps = total_bytes / elapsed / 1e9
         println("GPU 0 -> GPU $(peer_idx-1): Bandwidth = $(round(bw_gbps, digits=2)) GB/s")
+        add_result!("Intranode P2P Write 0->$(peer_idx-1)", bw_gbps, "GB/s")
     end
 
     println(".......{READ} GPU<*> to GPU 0.......")
@@ -79,5 +80,6 @@ function run_intranode(backend, comm)
         total_bytes = Float64(REPEAT) * N * sizeof(Float32)
         bw_gbps = total_bytes / elapsed / 1e9
         println("GPU $(peer_idx-1) -> GPU 0: Bandwidth = $(round(bw_gbps, digits=2)) GB/s")
+        add_result!("Intranode P2P Read $(peer_idx-1)->0", bw_gbps, "GB/s")
     end
 end

@@ -1,5 +1,5 @@
 """
-CUDA extension for ALCFBenchmarks - provides CUDA-specific topology discovery.
+CUDA extension for ALCFBenchmarks - provides CUDA-specific functionality.
 """
 module ALCFBenchmarksCUDAExt
 
@@ -8,6 +8,17 @@ using ALCFBenchmarks: DeviceInfo, P2PInfo
 using CUDA
 using Printf
 import KernelAbstractions as KA
+
+"""
+    get_backend_versioninfo(backend::CUDABackend) -> String
+
+Capture CUDA.versioninfo() output as a string.
+"""
+function ALCFBenchmarks.get_backend_versioninfo(backend::CUDABackend)
+    io = IOBuffer()
+    CUDA.versioninfo(io)
+    return String(take!(io))
+end
 
 """
     discover_topology(backend::CUDABackend) -> (devices, p2p_matrix)

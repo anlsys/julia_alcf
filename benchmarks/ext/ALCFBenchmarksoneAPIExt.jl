@@ -1,5 +1,5 @@
 """
-oneAPI extension for ALCFBenchmarks - provides oneAPI-specific topology discovery.
+oneAPI extension for ALCFBenchmarks - provides oneAPI-specific functionality.
 """
 module ALCFBenchmarksoneAPIExt
 
@@ -8,6 +8,17 @@ using ALCFBenchmarks: DeviceInfo, P2PInfo
 using oneAPI
 using Printf
 import KernelAbstractions as KA
+
+"""
+    get_backend_versioninfo(backend::oneAPIBackend) -> String
+
+Capture oneAPI.versioninfo() output as a string.
+"""
+function ALCFBenchmarks.get_backend_versioninfo(backend::oneAPIBackend)
+    io = IOBuffer()
+    oneAPI.versioninfo(io)
+    return String(take!(io))
+end
 
 """
     discover_topology(backend::oneAPIBackend) -> (devices, p2p_matrix)

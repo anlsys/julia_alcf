@@ -54,6 +54,7 @@ function bench_pci(backend, comm; num_elements::Int=(1 << 28), num_iterations::I
     if world_rank == 0
         H2D_bw = (N_bytes * world_size) / H2D_time  # GB/s (time in ns)
         println("PCIe Unidirectional Bandwidth (H2D): $H2D_bw GB/s")
+        add_result!("PCIe H2D Bandwidth", H2D_bw, "GB/s")
     end
 
     # Device-to-Host bandwidth
@@ -61,6 +62,7 @@ function bench_pci(backend, comm; num_elements::Int=(1 << 28), num_iterations::I
     if world_rank == 0
         D2H_bw = (N_bytes * world_size) / D2H_time  # GB/s
         println("PCIe Unidirectional Bandwidth (D2H): $D2H_bw GB/s")
+        add_result!("PCIe D2H Bandwidth", D2H_bw, "GB/s")
     end
 
     # Bidirectional bandwidth (H2D and D2H simultaneously)
@@ -68,6 +70,7 @@ function bench_pci(backend, comm; num_elements::Int=(1 << 28), num_iterations::I
     if world_rank == 0
         bidir_bw = (2 * N_bytes * world_size) / bidir_time  # GB/s
         println("PCIe Bidirectional Bandwidth: $bidir_bw GB/s")
+        add_result!("PCIe Bidirectional Bandwidth", bidir_bw, "GB/s")
     end
 end
 
