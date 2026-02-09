@@ -9,3 +9,15 @@ GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[weakdeps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+oneAPI = "8f75cd03-7ff8-4571-8f40-ed4f0852fcc5"
+
+[extensions]
+ALCFBenchmarksCUDAExt = "CUDA"
+ALCFBenchmarksoneAPIExt = "oneAPI"
+
+[compat]
+CUDA = "5.9.6"
