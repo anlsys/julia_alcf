@@ -23,3 +23,4 @@ ALCFBenchmarksoneAPIExt = "oneAPI"
 
 [compat]
 CUDA = "5.9.6"
+MPI = "0.20.23"
