@@ -4,7 +4,7 @@ _format = "1.0"
 abi = "MPICH"
 binary = "system"
 cclibs = []
-libmpi = "/opt/aurora/25.190.0/spack/unified/0.10.1/install/linux-sles15-x86_64/oneapi-2025.2.0/mpich-develop-git.6037a7a-cym6jg6/lib/libmpi"
+libmpi = "MPI_LIBMPI"
 mpiexec = "mpiexec"
 preloads = []
 

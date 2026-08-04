@@ -15,6 +15,16 @@ export JULIA_DEPOT_PATH=/soft/libraries/julia
 
 echo "Using JULIA_DEPOT_PATH: $JULIA_DEPOT_PATH"
 
+# Track whichever mpich module is loaded at deploy time instead of hard-coding a release
+# path that goes stale when Aurora rolls to a new /opt/aurora tree. MPI_ROOT is set by the
+# mpich modulefile; check it before anything is removed below.
+if [ ! -f "$MPI_ROOT/lib/libmpi.so" ]; then
+    echo "ERROR: \$MPI_ROOT does not point at an mpich install ('$MPI_ROOT')." >&2
+    echo "       Load the mpich module before running this script." >&2
+    exit 1
+fi
+echo "Using MPI: $MPI_ROOT"
+
 # Create Julia depot directory
 rm -rf $JULIA_DEPOT_PATH/*
 mkdir -p $JULIA_DEPOT_PATH
@@ -51,6 +61,7 @@ for JULIA_MINOR in "${!JULIA_VERSIONS[@]}"; do
     # Configure environment with depot path
     echo "Configuring environment with depot path..."
     sed -i "s|USER_DEPOT|$JULIA_DEPOT_PATH/julia_binaries/julia-$JULIA_MINOR|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
+    sed -i "s|MPI_LIBMPI|$MPI_ROOT/lib/libmpi|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
 
     # Create symbolic links to system libraries in Julia's lib directory
     echo "Creating symbolic links to system libraries..."

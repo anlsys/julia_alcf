@@ -61,7 +61,14 @@ setenv("ftp_proxy", "http://proxy.alcf.anl.gov:3128")
 if (mode() == "load") then
     LmodMessage("Julia module v" .. version .. " successfully loaded.")
     LmodMessage("Warning: Julia needs a large /tmp which is too small. It is set to " .. tmpdir)
+    LmodMessage("oneAPI.jl LTS workarounds enabled (ONEAPI_LTS=1); requires oneAPI.jl v2.8 or newer.\n" ..
+                "If you precompiled oneAPI before this was set, run Pkg.precompile() once.")
 end
 
 setenv("JULIA_MPI_HAS_ONEAPI", "1")
 setenv("ZE_FLAT_DEVICE_HIERARCHY", "FLAT")
+-- Aurora runs Intel's LTS Compute Runtime (NEO 25.18.33578 / IGC 2.11.29 / Level Zero
+-- 1.24), not the rolling stack oneAPI.jl targets by default. Read at load time by
+-- oneAPI.jl v2.8+, this compiles kernels with the Khronos SPIR-V translator and enables
+-- the LTS driver workarounds: https://juliagpu.github.io/oneAPI.jl/dev/lts/
+setenv("ONEAPI_LTS", "1")
