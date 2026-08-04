@@ -63,3 +63,4 @@ if (mode() == "load") then
 end
 
 setenv("JULIA_MPI_HAS_ONEAPI", "1")
+setenv("ZE_FLAT_DEVICE_HIERARCHY", "FLAT")
