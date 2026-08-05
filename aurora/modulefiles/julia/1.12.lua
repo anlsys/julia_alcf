@@ -14,6 +14,7 @@ local julia_depot = os.getenv("JULIA_DEPOT_PATH")
 if not julia_depot then
     local home = os.getenv("HOME")
     julia_depot = pathJoin(home, ".julia")
+    setenv("JULIA_DEPOT_PATH", julia_depot)
     LmodMessage("JULIA_DEPOT_PATH not set. Using default: " .. julia_depot .. "\n" ..
                 "To use a different location, set JULIA_DEPOT_PATH before loading this module.")
 end
