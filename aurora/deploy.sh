@@ -25,6 +25,22 @@ if [ ! -f "$MPI_ROOT/lib/libmpi.so" ]; then
 fi
 echo "Using MPI: $MPI_ROOT"
 
+# Same story for HDF5: point HDF5.jl at the system parallel build rather than its own
+# artifact, which is serial. HDF5_ROOT is set by the hdf5 modulefile, and because those
+# modulefiles live under the mpich hierarchy, `module load hdf5` resolves to the build
+# matching the mpich checked above. Verify it is actually a parallel build before using it.
+if [ ! -f "$HDF5_ROOT/lib/libhdf5.so" ] || [ ! -f "$HDF5_ROOT/lib/libhdf5_hl.so" ]; then
+    echo "ERROR: \$HDF5_ROOT does not point at an HDF5 install ('$HDF5_ROOT')." >&2
+    echo "       Run 'module load hdf5' before running this script." >&2
+    exit 1
+fi
+if ! strings "$HDF5_ROOT/lib/libhdf5.so" | grep -q "Parallel HDF5: ON"; then
+    echo "ERROR: '$HDF5_ROOT' is a serial HDF5 build." >&2
+    echo "       Load the hdf5 module from the mpich hierarchy (not hdf5/*-serial)." >&2
+    exit 1
+fi
+echo "Using HDF5: $HDF5_ROOT"
+
 # Create Julia depot directory
 rm -rf $JULIA_DEPOT_PATH/*
 mkdir -p $JULIA_DEPOT_PATH
@@ -62,6 +78,7 @@ for JULIA_MINOR in "${!JULIA_VERSIONS[@]}"; do
     echo "Configuring environment with depot path..."
     sed -i "s|USER_DEPOT|$JULIA_DEPOT_PATH/julia_binaries/julia-$JULIA_MINOR|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
     sed -i "s|MPI_LIBMPI|$MPI_ROOT/lib/libmpi|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
+    sed -i "s|HDF5_LIBDIR|$HDF5_ROOT/lib|g" $JULIA_DEPOT_PATH/environments/v$JULIA_MINOR/LocalPreferences.toml
 
     # Create symbolic links to system libraries in Julia's lib directory
     echo "Creating symbolic links to system libraries..."
