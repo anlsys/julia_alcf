@@ -72,3 +72,32 @@ setenv("ZE_FLAT_DEVICE_HIERARCHY", "FLAT")
 -- oneAPI.jl v2.8+, this compiles kernels with the Khronos SPIR-V translator and enables
 -- the LTS driver workarounds: https://juliagpu.github.io/oneAPI.jl/dev/lts/
 setenv("ONEAPI_LTS", "1")
+
+-- Intel's compiled-kernel cache, re-enabled.  The site oneapi module sets
+-- NEO_CACHE_PERSISTENT=0 unconditionally
+-- (/opt/aurora/*/oneapi/modulefiles/oneapi/release/*), which is defensible for
+-- AOT-compiled C++ but expensive for Julia: oneAPI.jl JIT-compiles every kernel
+-- through IGC at run time, in a fresh process each job, so with the cache off
+-- nothing is ever reused and each process pays full IGC compilation again.  In a
+-- benchmark campaign that dominated per-instance startup.
+--
+-- The cache lives beside the depot rather than in /tmp so it survives across
+-- jobs, which is the entire point -- a node-local cache is cold in every new
+-- allocation.
+--
+-- NEO_CACHE_PERSISTENT=0 is overridden rather than respected: the site module
+-- always sets it, so a 0 in the environment cannot be distinguished from a user
+-- who wants it off.  To keep it off, unset NEO_CACHE_DIR and set
+-- NEO_CACHE_PERSISTENT=0 AFTER loading this module.  NEO_CACHE_DIR itself is
+-- left alone whenever the user has already chosen one.
+local neo_cache = os.getenv("NEO_CACHE_DIR")
+if not neo_cache then
+    neo_cache = pathJoin(julia_depot, "neo_cache")
+    setenv("NEO_CACHE_DIR", neo_cache)
+    if (not isDir(neo_cache)) then
+        execute{cmd="mkdir -p " .. neo_cache, modeA={"load"}}
+    end
+end
+if not os.getenv("NEO_CACHE_PERSISTENT") or os.getenv("NEO_CACHE_PERSISTENT") == "0" then
+    setenv("NEO_CACHE_PERSISTENT", "1")
+end
