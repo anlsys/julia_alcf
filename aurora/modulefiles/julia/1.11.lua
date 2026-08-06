@@ -85,21 +85,25 @@ setenv("ONEAPI_LTS", "1")
 -- jobs, which is the entire point -- a node-local cache is cold in every new
 -- allocation.
 --
--- Both are set UNCONDITIONALLY, which is what makes them revert.  Guarding a
--- setenv behind `if not os.getenv(...)` breaks unload: Lmod re-evaluates this
+-- `pushenv`, unconditionally, is what makes these revert cleanly.
+--
+-- Unconditional matters because guarding a set behind `if not os.getenv(...)`
+-- breaks unload: Lmod re-evaluates this
 -- file in unload mode, finds the variable already set (by this very module),
 -- skips the setenv, and so never learns it should restore the previous value.
 -- The symptom is that `module unload julia` -- and even `module purge` -- leaves
 -- NEO_CACHE_PERSISTENT=1 and NEO_CACHE_DIR pointing into the Julia depot, so a
 -- subsequent plain SYCL/C++ job silently inherits Julia's kernel cache.
--- Setting them unconditionally lets Lmod record the prior values and put them
--- back, restoring the oneapi module's NEO_CACHE_PERSISTENT=0 on unload.
+-- `pushenv` rather than `setenv` matters because unloading a `setenv` UNSETS the
+-- variable instead of restoring what was there before, and to NEO an unset
+-- NEO_CACHE_PERSISTENT is not the same as 0.  `pushenv` saves the oneapi
+-- module's 0 and puts it back, leaving the environment exactly as it was.
 --
 -- To use a different cache, or to turn persistence back off, set the variables
 -- AFTER loading this module.
 local neo_cache = pathJoin(julia_depot, "neo_cache")
-setenv("NEO_CACHE_DIR", neo_cache)
-setenv("NEO_CACHE_PERSISTENT", "1")
+pushenv("NEO_CACHE_DIR", neo_cache)
+pushenv("NEO_CACHE_PERSISTENT", "1")
 if (not isDir(neo_cache)) then
     execute{cmd="mkdir -p " .. neo_cache, modeA={"load"}}
 end
