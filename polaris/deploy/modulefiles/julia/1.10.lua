@@ -29,7 +29,7 @@ if not isDir(julia_dir) then
 end
 
 load("cray-mpich")
-load("cudatoolkit-standalone/12.9.1")
+load("cudatoolkit-standalone/13.0.1")
 load("cuda")
 unload("xalt")
 unload("darshan")
