@@ -6,10 +6,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Define all Julia versions to install
 declare -A JULIA_VERSIONS
-JULIA_VERSIONS["1.10"]="1.10.11"
+JULIA_VERSIONS["1.10"]="1.10.12"
 JULIA_VERSIONS["1.11"]="1.11.9"
-JULIA_VERSIONS["1.12"]="1.12.6"
-JULIA_VERSIONS["1.13"]="1.13.0"
+JULIA_VERSIONS["1.12"]="1.12.7"
+JULIA_VERSIONS["1.13"]="1.13.1"
 
 # Prompt user for Julia depot path only if not already set
 export JULIA_DEPOT_PATH=/soft/libraries/julia
