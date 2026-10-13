@@ -67,7 +67,7 @@ end
 
 setenv("JULIA_MPI_HAS_ONEAPI", "1")
 setenv("ZE_FLAT_DEVICE_HIERARCHY", "FLAT")
--- Aurora runs Intel's LTS Compute Runtime (NEO 25.18.33578 / IGC 2.11.29 / Level Zero
+-- Aurora runs Intel's LTS Compute Runtime (NEO 25.18.33578 / IGC 2.11.43 / Level Zero
 -- 1.24), not the rolling stack oneAPI.jl targets by default. Read at load time by
 -- oneAPI.jl v2.8+, this compiles kernels with the Khronos SPIR-V translator and enables
 -- the LTS driver workarounds: https://juliagpu.github.io/oneAPI.jl/dev/lts/
@@ -107,3 +107,15 @@ pushenv("NEO_CACHE_PERSISTENT", "1")
 if (not isDir(neo_cache)) then
     execute{cmd="mkdir -p " .. neo_cache, modeA={"load"}}
 end
+
+-- IGC SoA promotion, disabled.  IGC 2.11.43 (LTS 2523.78) segfaults ("IGC: Internal
+-- Compiler Error: Segmentation violation", ZE_RESULT_ERROR_MODULE_BUILD_FAILURE) when it
+-- promotes a private array whose address is stored to memory, e.g. a KernelAbstractions
+-- 0.10 `@private` array passed to a non-inlined function: SOALayoutChecker leaves a stale
+-- parentLevelInst behind and misses the escaping store.  Fixed upstream in IGC 8d51f7fae
+-- (v2.42); drop this once Aurora's driver includes it.  With promotion off, small private
+-- arrays stay in per-thread memory instead of vector registers.
+--
+-- IGC reads this for every compilation in the process, so it also applies to SYCL/OpenCL
+-- programs run while this module is loaded.  `pushenv` for the same reason as above.
+pushenv("IGC_DisableSOAPromotion", "1")
